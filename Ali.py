@@ -21,66 +21,60 @@ class AliExpressItem:
 
 		self.openUrl()
 	
+	def cache(key):
+		def decorator(func):
+			def wrapper(self, *args, **kwargs):
+				if not self.isInItemInfo(key):
+					self.itemInfo[key] = func(self, *args, **kwargs)
+				return self.itemInfo[key]
+			return wrapper
+		return decorator
+
 	def openUrl(self):
 		self.parsedHTML = getHtml(self.url)
 
 	def openGalleryUrl(self):
-		self.parsedGallery = getHtml(self.galleryUrl)
+		self.parsedGallery = getHtml(self.itemInfo['gallery-url'])
 
 	def isInItemInfo(self, key):
 		return key in self.itemInfo
 
-	def getId(self, key='id'):
-		if not self.isInItemInfo(key):
-			self.itemInfo[key] = re.findall('/([0-9]*?).html.*?', self.url)[0]
+	@cache(key='id')
+	def getId(self):
+		return re.findall('/([0-9]*?).html.*?', self.url)[0]
 
-		return self.itemInfo[key]
+	@cache(key='name')
+	def getName(self):
+		return re.findall('<h1 class="product-name".*?\>(.*?)</h1>', self.parsedHTML)[0]
 
-	def getName(self, key='name'):
-		if not self.isInItemInfo(key):
-			self.itemInfo[key] = re.findall('<h1 class="product-name".*?\>(.*?)</h1>', self.parsedHTML)[0]
+	@cache(key='price')
+	def getPrice(self):
+		priceBlock = re.findall('<div class="p-price-content.*?>(.*?)</div>', self.parsedHTML)[0]
+		return ' - '.join(re.findall('[0-9\.]+', priceBlock))
 
-		return self.itemInfo[key]
+	@cache(key='rating')
+	def getRating(self):
+		return re.findall('<span class="percent-num">(.*?)</span>', self.parsedHTML)[0]
 
-	def getPrice(self, key='price'):
-		if not self.isInItemInfo(key):
-			priceBlock = re.findall('<div class="p-price-content.*?>(.*?)</div>', self.parsedHTML)[0]
-			self.itemInfo[key] = ' - '.join(re.findall('[0-9\.]+', priceBlock))
+	@cache(key='orders')
+	def getOrders(self):
+		return re.findall('<span class="order-num" id="j-order-num">([0-9]+)', self.parsedHTML)[0]
 
-		return self.itemInfo[key]
-
-	def getRating(self, key='rating'):
-		if not self.isInItemInfo(key):
-			self.itemInfo[key] = re.findall('<span class="percent-num">(.*?)</span>', self.parsedHTML)[0]
-		return self.itemInfo[key]
-
-	def getOrders(self, key='orders'):
-		if not self.isInItemInfo(key):
-			self.itemInfo[key] = re.findall('<span class="order-num" id="j-order-num">([0-9]+)', self.parsedHTML)[0]
-		return self.itemInfo[key]
-
+	@cache(key='gallery-url')
 	def getGalleryUrl(self):
-		if not self.galleryUrl:
-			self.galleryUrl = self.url.replace('/item/', '/item-img/')
+		return self.url.replace('/item/', '/item-img/')
 
-		return self.galleryUrl
+	@cache(key='images-url')
+	def getGalleryImages(self):
+		self.getGalleryUrl()
+		self.openGalleryUrl()
 
-	def getGalleryImages(self, key='images-url'):
-		if not self.parsedGallery:
-			self.getGalleryUrl()
-			self.openGalleryUrl()
+		block = re.findall('<ul class="new-img-border">(.*?)</ul>', self.parsedGallery)[0]
+		return re.findall('<img src="(.*?)".*?>', block)
 
-		if not self.isInItemInfo(key):
-			block = re.findall('<ul class="new-img-border">(.*?)</ul>', self.parsedGallery)[0]
-			self.itemInfo[key] = re.findall('<img src="(.*?)".*?>', block)
-
-		return self.itemInfo[key]
-
-	def getImageUrl(self, key='image-url'):
-		if not self.isInItemInfo(key):
-			self.itemInfo[key] = re.findall('<div class="ui-image-viewer-thumb-wrap" data-role="thumbWrap">.*?<img.*?src="(.*?)".*?</a></div>', self.parsedHTML)[0]
-
-		return self.itemInfo[key]
+	@cache(key='image-url')
+	def getImageUrl(self):
+		return re.findall('<div class="ui-image-viewer-thumb-wrap" data-role="thumbWrap">.*?<img.*?src="(.*?)".*?</a></div>', self.parsedHTML)[0]
 
 	def downloadImage(self, url='', filename='photo.jpg'):
 		if not url: url = self.getImageUrl(self.url)
