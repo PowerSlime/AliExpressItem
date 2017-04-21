@@ -1,5 +1,5 @@
-# AliExpressItem
 <img src="https://raw.githubusercontent.com/PowerSlime/AliExpressItem/master/logo.png" alt="AliExpressItem by PowerSlime">
+# AliExpressItem
 <p>It's my simple parser for lot on AliExpress... With him you can get some information about item without using any tokens and accounts.</p>
 
 # Requiremets 
@@ -13,7 +13,7 @@ item = Ali.AliExpressItem(url)
 item.METHOD()</code></pre>
 
 
-<b>AVIABLE METHODS:</b>
+# AVIABLE METHODS
 <ul>
 	<li>getId</li>
 	<li>getName</li>
@@ -26,5 +26,6 @@ item.METHOD()</code></pre>
 	<li>downloadImage([url][,filename])</li>
 </ul>
 
+# P.S.
 <p>So... This code is shitty a little :) But... If anyone need to get product's info from an AliExpress <b>product's</b> page - I'll be happy, if you will use my lib ;)</p>
 <p><b>Thanks</b></p>
