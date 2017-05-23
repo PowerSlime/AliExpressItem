@@ -3,7 +3,7 @@ import re, urllib.request
 def getHtml(url):
 	return urllib.request.urlopen(url).read().decode('utf-8').replace('\n', '')
 
-class AliExpressItem:
+class AliExpressItem(object):
 	'''
 	import Ali
 	item = Ali.AliExpressItem(url)
@@ -20,7 +20,7 @@ class AliExpressItem:
 		self.itemInfo = {}
 
 		self.openUrl()
-	
+
 	def cache(key):
 		def decorator(func):
 			def wrapper(self, *args, **kwargs):
@@ -58,7 +58,7 @@ class AliExpressItem:
 
 	@cache(key='orders')
 	def getOrders(self):
-		return re.findall('<span class="order-num" id="j-order-num">([0-9]+)', self.parsedHTML)[0]
+		return int(re.findall('<span class="order-num" id="j-order-num">([0-9]+)', self.parsedHTML)[0])
 
 	@cache(key='gallery-url')
 	def getGalleryUrl(self):
@@ -77,5 +77,7 @@ class AliExpressItem:
 		return re.findall('<div class="ui-image-viewer-thumb-wrap" data-role="thumbWrap">.*?<img.*?src="(.*?)".*?</a></div>', self.parsedHTML)[0]
 
 	def downloadImage(self, url='', filename='photo.jpg'):
-		if not url: url = self.getImageUrl(self.url)
+		if not url:
+			url = self.getImageUrl(self.url)
+
 		urllib.request.urlretrieve(url, filename)
