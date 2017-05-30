@@ -78,6 +78,6 @@ class AliExpressItem(object):
 
 	def downloadImage(self, url='', filename='photo.jpg'):
 		if not url:
-			url = self.getImageUrl(self.url)
+			url = self.getImageUrl()
 
 		urllib.request.urlretrieve(url, filename)
