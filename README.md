@@ -8,10 +8,11 @@
 Libraries: <b>re, urllib</b></p>
 
 # How to use
-<pre>
-<code>import Ali
+```Python
+import Ali
 item = Ali.AliExpressItem(url)
-item.METHOD()</code></pre>
+item.METHOD()
+```
 
 
 # AVIABLE METHODS
